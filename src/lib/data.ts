@@ -39,6 +39,12 @@ export const I18N: Record<string, Record<string,string>> = {
   hi: { tagline:"हर नागरिक के लिए सरकारी लाभ, आसान भाषा में।", find:"योजनाएँ खोजें", ask:"GramAI से पूछें", docs:"दस्तावेज़", journey:"मेरी यात्रा", services:"पंचायत सेवाएँ", complaints:"शिकायतें", dashboard:"डैशबोर्ड", demo:"डेमो देखें", heroTitle:"हर योजना जिसके आप हकदार हैं। एक ही जगह।", heroSub:"कल्याण योजनाएँ खोजें, आसान भाषा में पात्रता जांचें, दस्तावेज़ तैयार करें — हिन्दी, English और తెలుగు में।" },
 };
 
+export function getSchemeName(s: Scheme, lang: string = "en"): string {
+  if (lang === "te" && s.nameTe) return s.nameTe;
+  if (lang === "hi" && s.nameHi) return s.nameHi;
+  return s.name;
+}
+
 export type CitizenProfile = { name:string; phone:string; state:string; district:string; village:string; occupation:string; age:number; gender:string; income:number; category:string; land:string; role:string };
 export const DEMO_PROFILE: CitizenProfile = { name:"Ramesh Yadav", phone:"98765 43210", state:"Telangana", district:"Warangal", village:"Rampur", occupation:"Farmer", age:42, gender:"Male", income:85000, category:"OBC", land:"2.5 acres", role:"citizen" };
 export const DEMO_PROFILES: (CitizenProfile & {label:string; desc:string})[] = [

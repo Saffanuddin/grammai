@@ -1,24 +1,38 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import * as schema from "./schema";
 
 const databaseUrl = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is required");
-}
-
 const globalForDb = globalThis as typeof globalThis & {
-  __arenaNextJsPostgresqlPool?: Pool;
+  __gramAiPostgresPool?: Pool;
 };
 
-export const pool =
-  globalForDb.__arenaNextJsPostgresqlPool ??
-  new Pool({
-    connectionString: databaseUrl,
-  });
+let poolInstance: Pool | null = null;
+let dbInstance: ReturnType<typeof drizzle> | null = null;
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.__arenaNextJsPostgresqlPool = pool;
+if (databaseUrl) {
+  try {
+    poolInstance =
+      globalForDb.__gramAiPostgresPool ??
+      new Pool({
+        connectionString: databaseUrl,
+        ssl: { rejectUnauthorized: false },
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 20000,
+      });
+
+    if (process.env.NODE_ENV !== "production") {
+      globalForDb.__gramAiPostgresPool = poolInstance;
+    }
+
+    dbInstance = drizzle(poolInstance, { schema });
+  } catch (err) {
+    console.warn("[Database] Connection pool initialization failed:", err);
+  }
 }
 
-export const db = drizzle(pool);
+export const pool = poolInstance;
+export const db = dbInstance as any;
+export const isDbConfigured = Boolean(databaseUrl && dbInstance);

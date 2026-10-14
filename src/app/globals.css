@@ -1,7 +1,17 @@
 @import "tailwindcss";
 
-html { scroll-behavior: smooth; }
-body { background: #f4f7f2; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #f4f7f2;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
 ::-webkit-scrollbar { height: 6px; width: 8px; }
 ::-webkit-scrollbar-thumb { background: #a7c4a0; border-radius: 99px; }
 @media print { header, footer, .fixed { display: none !important; } }
+

@@ -85,3 +85,35 @@ export const journey = pgTable("journey", {
   score: integer("score").default(0),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash"),
+  phone: text("phone").default(""),
+  role: text("role").default("citizen").notNull(),
+  image: text("image"),
+  provider: text("provider").default("credentials").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const accounts = pgTable("accounts", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  provider: text("provider").notNull(),
+  providerAccountId: text("provider_account_id").notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  expiresAt: integer("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const sessions = pgTable("sessions", {
+  id: serial("id").primaryKey(),
+  sessionToken: text("session_token").notNull().unique(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});

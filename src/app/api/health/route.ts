@@ -1,13 +1,30 @@
-import { db } from "@/db";
+import { db, isDbConfigured } from "@/db";
+import { getProviderStatus } from "@/lib/config";
 import { sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  try {
-    await db.execute(sql`select 1`);
-    return Response.json({ ok: true });
-  } catch {
-    return Response.json({ ok: false }, { status: 500 });
+  const providers = getProviderStatus();
+  let dbOk = false;
+
+  if (isDbConfigured && db) {
+    try {
+      await db.execute(sql`select 1`);
+      dbOk = true;
+    } catch (err: any) {
+      console.warn("[HealthCheck] DB query failed:", err?.message);
+    }
   }
+
+  return Response.json({
+    ok: true,
+    timestamp: new Date().toISOString(),
+    service: "GramAI Connect",
+    database: {
+      configured: isDbConfigured,
+      connected: dbOk,
+    },
+    integrations: providers,
+  });
 }
